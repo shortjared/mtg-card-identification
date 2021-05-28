@@ -32,7 +32,7 @@ class FeatureExtractor:
         new_im = Image.new("RGB", (desired_size, desired_size))
         new_im.paste(img, ((desired_size-new_size[0])//2,
                             (desired_size-new_size[1])//2))
-                            
+
         delta_w = desired_size - new_size[0]
         delta_h = desired_size - new_size[1]
         padding = (delta_w//2, delta_h//2, delta_w-(delta_w//2), delta_h-(delta_h//2))

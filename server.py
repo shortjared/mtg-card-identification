@@ -4,6 +4,12 @@ from feature_extractor import FeatureExtractor
 from datetime import datetime
 from flask import Flask, request, render_template
 from pathlib import Path
+import keras_ocr
+import io
+
+# keras-ocr will automatically download pretrained
+# weights for the detector and recognizer.
+pipeline = keras_ocr.pipeline.Pipeline()
 
 app = Flask(__name__)
 
@@ -33,6 +39,11 @@ def index():
         ids = np.argsort(dists)[:30]  # Top 30 results
         scores = [(dists[id], img_paths[id]) for id in ids]
 
+        images = [
+            keras_ocr.tools.read(uploaded_img_path)
+        ]
+        prediction_groups = pipeline.recognize(images)
+        print(prediction_groups)
         return render_template('index.html',
                                query_path=uploaded_img_path,
                                scores=scores)
