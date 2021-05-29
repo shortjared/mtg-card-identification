@@ -8,6 +8,10 @@ tensorflow = ">=2.0.0"
 Pillow = "*"
 Flask = "*"
 keras-ocr = "*"
+opencv-contrib-python = "*"
+imutils = "*"
+boto3 = "*"
+meilisearch = "*"
 
 [dev-packages]
 
