@@ -1,3 +1,4 @@
+from flask.scaffold import F
 from card_determiner import CardDeterminer
 import numpy as np
 from PIL import Image
@@ -30,11 +31,11 @@ def index():
         img = Image.open(file.stream)  # PIL image
         uploaded_img_path = "static/uploaded/" + datetime.now().isoformat().replace(":", ".") + "_" + file.filename
         img.save(uploaded_img_path)
-        cd.detect_text(uploaded_img_path)
-
+        found = cd.detect_text(uploaded_img_path)
         card = ce.extract(uploaded_img_path)
         card = Image.open(uploaded_img_path)
 
+        
         # Run search
         query = fe.extract(card)
         dists = np.linalg.norm(features-query, axis=1)  # L2 distances to features
@@ -47,6 +48,7 @@ def index():
         # prediction_groups = pipeline.recognize(images)
         # print(prediction_groups)
         return render_template('index.html',
+                               found=found,
                                query_path=uploaded_img_path,
                                scores=scores)
     else:

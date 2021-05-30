@@ -12,7 +12,10 @@ with open('zz.json') as f:
   data = json.load(f)
 
   count = 0
-  for chunk in list(chunks(data, 100)):
+  for chunk in list(chunks(data, 5000)):
+      for idx, entry in enumerate(chunk):
+          if entry['digital'] == True:
+            del chunk[idx]
       index.add_documents(chunk) # => { "updateId": 0 }
       count = count + len(chunk)
       print(f'added: {count}')

@@ -12,6 +12,9 @@ opencv-contrib-python = "*"
 imutils = "*"
 boto3 = "*"
 meilisearch = "*"
+dataclasses = "*"
+scipy = "*"
+imagehash = "*"
 
 [dev-packages]
 
