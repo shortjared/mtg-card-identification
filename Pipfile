@@ -15,6 +15,7 @@ meilisearch = "*"
 dataclasses = "*"
 scipy = "*"
 imagehash = "*"
+symspellpy = "*"
 
 [dev-packages]
 

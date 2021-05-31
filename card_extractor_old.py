@@ -1,8 +1,70 @@
+# import the necessary packages
+from skimage import exposure
+import numpy as np
+import argparse
+import imutils
+import cv2
+import os
+
+
+class CropLayer(object):
+	def __init__(self, params, blobs):
+		# initialize our starting and ending (x, y)-coordinates of
+		# the crop
+		self.startX = 0
+		self.startY = 0
+		self.endX = 0
+		self.endY = 0
+
+	def getMemoryShapes(self, inputs):
+		# the crop layer will receive two inputs -- we need to crop
+		# the first input blob to match the shape of the second one,
+		# keeping the batch size and number of channels
+		(inputShape, targetShape) = (inputs[0], inputs[1])
+		(batchSize, numChannels) = (inputShape[0], inputShape[1])
+		(H, W) = (targetShape[2], targetShape[3])
+
+		# compute the starting and ending crop coordinates
+		self.startX = int((inputShape[3] - targetShape[3]) / 2)
+		self.startY = int((inputShape[2] - targetShape[2]) / 2)
+		self.endX = self.startX + W
+		self.endY = self.startY + H
+
+		# return the shape of the volume (we'll perform the actual
+		# crop during the forward pass
+		return [[batchSize, numChannels, H, W]]
+
+	def forward(self, inputs):
+		# use the derived (x, y)-coordinates to perform the crop
+		return [inputs[0][:, :, self.startY:self.endY,
+				self.startX:self.endX]]
+
+# load our serialized edge detector from disk
+print("[INFO] loading edge detector...")
+protoPath = os.path.sep.join(['hed_model',
+	"deploy.prototxt"])
+modelPath = os.path.sep.join(['hed_model',
+	"hed_pretrained_bsds.caffemodel"])
+net = cv2.dnn.readNetFromCaffe(protoPath, modelPath)
+
+# register our new layer with the model
+cv2.dnn_registerLayer("Crop", CropLayer)
+
+def auto_canny(image, sigma=0.7):
+	# compute the median of the single channel pixel intensities
+	v = np.median(image)
+	# apply automatic Canny edge detection using the computed median
+	lower = int(max(0, (1.0 - sigma) * v))
+	upper = int(min(255, (1.0 + sigma) * v))
+	edged = cv2.Canny(image, lower, upper)
+	# return the edged image
+	return edged
+
 class CardExtractor:
 	def __init__(self) -> None:
 		pass
 
-	def extract(self, img, found_ids):
+	def extract(self, img):
 		# load the query image, compute the ratio of the old height
 		# to the new height, clone it, and resize it
 		image = cv2.imread(img)
